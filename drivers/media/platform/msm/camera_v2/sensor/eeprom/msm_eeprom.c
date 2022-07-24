@@ -56,11 +56,7 @@ static int msm_get_read_mem_size
 		}
 		for (i = 0; i < eeprom_map->memory_map_size; i++) {
 			if (eeprom_map->mem_settings[i].i2c_operation ==
-				MSM_CAM_READ ||
-				eeprom_map->mem_settings[i].i2c_operation ==
-				MSM_CAM_READ_CONTINUOUS ||
-				eeprom_map->mem_settings[i].i2c_operation ==
-				MSM_CAM_READ_PAGE) {
+				MSM_CAM_READ) {
 				size += eeprom_map->mem_settings[i].reg_data;
 			}
 		}
@@ -371,10 +367,9 @@ static int eeprom_parse_memory_map(struct msm_eeprom_ctrl_t *e_ctrl,
 				eeprom_map->slave_addr >> 1;
 		}
 		CDBG("Slave Addr: 0x%X\n", eeprom_map->slave_addr);
-		CDBG("Memory map Size: %d", eeprom_map->memory_map_size);
+		CDBG("Memory map Size: %d",
+			eeprom_map->memory_map_size);
 		for (i = 0; i < eeprom_map->memory_map_size; i++) {
-			struct msm_camera_reg_settings_t mem_setting =
-					eeprom_map->mem_settings[i];
 			switch (eeprom_map->mem_settings[i].i2c_operation) {
 			case MSM_CAM_WRITE: {
 				e_ctrl->i2c_client.addr_type =
