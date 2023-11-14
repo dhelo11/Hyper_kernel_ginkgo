@@ -1087,27 +1087,8 @@ static int sugov_init(struct cpufreq_policy *policy)
 		goto stop_kthread;
 	}
 
-	tunables->up_rate_limit_us =
-				cpufreq_policy_transition_delay_us(policy);
-	tunables->down_rate_limit_us =
-				cpufreq_policy_transition_delay_us(policy);
-	tunables->hispeed_load = DEFAULT_HISPEED_LOAD;
-	tunables->hispeed_freq = 0;
-
-	tunables->iowait_boost_enable = true;
-
-	switch (policy->cpu) {
-	default:
-	case 0:
-		tunables->rtg_boost_freq = DEFAULT_CPU0_RTG_BOOST_FREQ;
-		break;
-	case 4:
-		tunables->rtg_boost_freq = DEFAULT_CPU4_RTG_BOOST_FREQ;
-		break;
-	case 7:
-		tunables->rtg_boost_freq = DEFAULT_CPU7_RTG_BOOST_FREQ;
-		break;
-	}
+	tunables->up_rate_limit_us = 500;
+	tunables->down_rate_limit_us = 1000;
 
 	policy->governor_data = sg_policy;
 	sg_policy->tunables = tunables;
