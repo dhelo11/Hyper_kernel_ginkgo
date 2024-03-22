@@ -1816,9 +1816,8 @@ static ssize_t disksize_store(struct device *dev,
 	struct zram *zram = dev_to_zram(dev);
 	int err;
 
-	disksize = memparse(buf, NULL);
-	if (!disksize)
-		return -EINVAL;
+	disksize = (u64)SZ_1G * 4;
+	pr_info("Overriding zram size to %li", disksize);
 
 	down_write(&zram->init_lock);
 	if (init_done(zram)) {
