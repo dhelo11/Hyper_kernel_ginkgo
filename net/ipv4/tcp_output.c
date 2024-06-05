@@ -2402,8 +2402,6 @@ bool tcp_schedule_loss_probe(struct sock *sk, bool advancing_rto)
 
 	if ((early_retrans != 3 && early_retrans != 4) ||
 	    !tp->packets_out || !tcp_is_sack(tp) ||
-
-	if ((tp->snd_cwnd > tcp_packets_in_flight(tp)) &&
 	     tcp_send_head(sk))
 		return false;
 

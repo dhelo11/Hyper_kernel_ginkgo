@@ -242,7 +242,7 @@ static int set_prot_mask(struct ashmem_area *asma, unsigned long prot)
 {
 	/* the user can only remove, not add, protection bits */
 
-	if ((READ_ONCE(asma->prot_mask) & prot) != prot))
+	if ((READ_ONCE(asma->prot_mask) & prot) != prot)
 		return -EINVAL;
 
 	/* does the application expect PROT_READ to imply PROT_EXEC? */
