@@ -20,7 +20,7 @@
 #include <linux/battery_saver.h>
 #include "sched.h"
 
-#define SUGOV_KTHREAD_PRIORITY	25
+#define SUGOV_KTHREAD_PRIORITY	50
 
 struct sugov_tunables {
 	struct gov_attr_set attr_set;
