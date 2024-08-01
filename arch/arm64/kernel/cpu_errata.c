@@ -339,6 +339,31 @@ void arm64_set_ssbd_mitigation(bool state)
 	}
 }
 
+#if defined(CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY) || \
+	defined(CONFIG_ARM64_SSBD)
+void __init arm64_update_smccc_conduit(struct alt_instr *alt,
+				       __le32 *origptr, __le32 *updptr,
+				       int nr_inst)
+{
+	u32 insn;
+
+	BUG_ON(nr_inst != 1);
+
+	switch (psci_ops.conduit) {
+	case PSCI_CONDUIT_HVC:
+		insn = aarch64_insn_get_hvc_value();
+		break;
+	case PSCI_CONDUIT_SMC:
+		insn = aarch64_insn_get_smc_value();
+		break;
+	default:
+		return;
+	}
+
+	*updptr = cpu_to_le32(insn);
+}
+#endif /* CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY || CONFIG_ARM64_SSBD */
+
 static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
 				    int scope)
 {
@@ -773,6 +798,14 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 				  15, 15),
 	},
 #endif
+#ifdef CONFIG_ARM64_ERRATUM_1742098
+        {
+                .desc = "ARM erratum 1742098",
+                .capability = ARM64_WORKAROUND_1742098,
+                CAP_MIDR_RANGE_LIST(broken_aarch32_aes),
+                .type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+        },
+#endif
 	{
 		.desc = "Spectre-BHB",
 		.capability = ARM64_SPECTRE_BHB,
@@ -780,14 +813,6 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.matches = is_spectre_bhb_affected,
 		.cpu_enable = spectre_bhb_enable_mitigation,
 	},
-#ifdef CONFIG_ARM64_ERRATUM_1742098
-	{
-		.desc = "ARM erratum 1742098",
-		.capability = ARM64_WORKAROUND_1742098,
-		CAP_MIDR_RANGE_LIST(broken_aarch32_aes),
-		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
-	},
-#endif
 	{
 	}
 };
@@ -1132,6 +1157,7 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 	} else if (spectre_bhb_loop_affected(SCOPE_LOCAL_CPU)) {
 		switch (spectre_bhb_loop_affected(SCOPE_SYSTEM)) {
 		case 8:
+
 			/*
 			 * A57/A72-r0 will already have selected the
 			 * spectre-indirect vector, which is sufficient
